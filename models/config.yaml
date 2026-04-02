@@ -1,0 +1,35 @@
+aggregation_features: true
+categorical_cols:
+- ind_empleado
+- sexo
+- segmento
+- canal_entrada
+- indresi
+- indext
+- pais_residencia
+- tiprel_1mes
+- indfall
+- product_tier
+encoding_method: onehot
+exclude_cols:
+- ncodpers
+- fecha_dato
+- fecha_alta
+- ult_fec_cli_1t
+- nomprov
+imputation_strategy: median
+interaction_features: false
+numeric_cols:
+- age
+- antiguedad
+- renta
+- ind_actividad_cliente
+- n_active_products
+random_state: 42
+target_prefix: ind_
+target_suffix: _ult1
+temporal_features: true
+time_split:
+  train_end: '2015-12-31'
+  val_end: '2016-03-31'
+  val_start: '2016-01-01'

@@ -26,18 +26,40 @@ def handle_missing(df: pd.DataFrame, strategy: str = 'median') -> pd.DataFrame:
     df_copy = df.copy()
     
     # Числовые признаки: импутация медианой
-    numeric_cols = df_copy.select_dtypes(include=[np.number]).columns
+    numeric_cols = df_copy.select_dtypes(include=[np.number]).columns.tolist()
+    
     if len(numeric_cols) > 0:
-        imputer = SimpleImputer(strategy=strategy)
-        df_copy[numeric_cols] = imputer.fit_transform(df_copy[numeric_cols])
+        # Фильтруем колонки, которые содержат хотя бы одно не-NaN значение
+        valid_numeric_cols = []
+        for col in numeric_cols:
+            if df_copy[col].notna().any():
+                valid_numeric_cols.append(col)
+            else:
+                # Если все значения NaN, заполняем 0
+                df_copy[col] = 0
+        
+        if len(valid_numeric_cols) > 0:
+            imputer = SimpleImputer(strategy=strategy)
+            # fit_transform возвращает numpy array, нужно преобразовать обратно в DataFrame
+            imputed_values = imputer.fit_transform(df_copy[valid_numeric_cols])
+            df_copy[valid_numeric_cols] = pd.DataFrame(
+                imputed_values, 
+                index=df_copy.index, 
+                columns=valid_numeric_cols
+            )
     
     # Категориальные признаки: импутация модой
-    categorical_cols = df_copy.select_dtypes(include=['object']).columns
+    categorical_cols = df_copy.select_dtypes(include=['object', 'category']).columns.tolist()
+    
     if len(categorical_cols) > 0:
         for col in categorical_cols:
             if df_copy[col].isnull().any():
-                mode_value = df_copy[col].mode()[0]
-                df_copy[col] = df_copy[col].fillna(mode_value)
+                mode_value = df_copy[col].mode()
+                if not mode_value.empty:
+                    df_copy[col] = df_copy[col].fillna(mode_value[0])
+                else:
+                    # Если моды нет (все NaN), заполняем константой
+                    df_copy[col] = df_copy[col].fillna('unknown')
     
     return df_copy
 
@@ -69,17 +91,23 @@ def encode_categorical(
     df_copy = df.copy()
     
     if encoding_method == 'onehot':
-        df_encoded = pd.get_dummies(
-            df_copy,
-            columns=cols,
-            drop_first=drop_first,
-            dtype=int
-        )
+        # Фильтруем колонки, которые существуют в датафрейме
+        valid_cols = [col for col in cols if col in df_copy.columns]
+        if len(valid_cols) > 0:
+            df_encoded = pd.get_dummies(
+                df_copy,
+                columns=valid_cols,
+                drop_first=drop_first,
+                dtype=int
+            )
+        else:
+            df_encoded = df_copy
         return df_encoded
     
     elif encoding_method == 'label':
         for col in cols:
-            df_copy[col] = df_copy[col].astype('category').cat.codes
+            if col in df_copy.columns:
+                df_copy[col] = df_copy[col].astype('category').cat.codes
         return df_copy
     
     else:
