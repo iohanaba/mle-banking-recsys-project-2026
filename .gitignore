@@ -75,3 +75,8 @@ docker-compose.override.yml
 # Системные файлы
 .DS_Store
 Thumbs.db
+
+# Логи мониторинга (исключаем контент, но не саму директорию)
+logs/*.jsonl
+logs/*.log
+!logs/.gitkeep
