@@ -1,0 +1,77 @@
+# Данные и кэш
+data/
+*.csv
+*.cache
+*.parquet
+*.pkl
+
+# Виртуальные окружения
+env-bank-recsys/
+.venv/
+venv/
+ENV/
+
+# Python артефакты
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+!README.md
+
+# MLflow и артефакты моделей
+mlruns/
+mlflow-artifacts/
+*.model
+*.pt
+*.pth
+*.onnx
+*.joblib
+
+# IDE и редакторы
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pysettings
+
+# Логи и временные файлы
+*.log
+tmp/
+temp/
+*.tmp
+
+# Конфигурации с секретами
+.env
+*.key
+*.pem
+credentials.json
+
+# Docker
+!.dockerignore
+docker-compose.override.yml
+
+# Системные файлы
+.DS_Store
+Thumbs.db
