@@ -20,35 +20,23 @@
 
 ```bash
 mle-banking-recsys-project-2026/
-├── project_pipeline.ipynb # Основной артефакт: единый ноутбук с полным циклом
+├── project_pipeline.ipynb # Основной артефакт: единый ноутбук
 ├── src/
-│ ├── features/ # Генерация признаков (engineering.py)
-│ ├── models/ # Обучение, инференс, метрики (train.py, metrics.py)
-│ ├── api/ # FastAPI приложение (app.py)
-│ ├── monitoring/ # Метрики мониторинга (metrics.py)
-│ └── utils/ # Предобработка, конфиги (preprocessing.py)
-├── data/
-│ ├── raw/ # Исходные данные (игнорируется .gitignore)
-│ └── processed/ # Обработанные фичи (опционально)
-├── docker/
+│ ├── features/ # Генерация признаков
+│ ├── models/ # Обучение, инференс, метрики
+│ ├── api/ # FastAPI приложение
+│ ├── monitoring/ # Метрики мониторинга
+│ └── utils/ # Предобработка
+├── data/ # Данные (игнорируется .gitignore)
+├── docker/ # Docker-конфигурация
 │ ├── Dockerfile # Инструкции для сборки образа
 │ └── docker-compose.yml # Оркестрация контейнеров
-├── airflow/
-│ └── dags/
-│ └── retrain_dag.py # DAG для периодического переобучения
-├── scripts/
-│ ├── setup_mlflow.sh # Запуск MLflow tracking server
-│ ├── setup_production.sh # Запуск полного стека: API + мониторинг
-│ └── download_data.sh # Загрузка и распаковка данных
-├── models/ # Сохранённые модели и конфиги
-│ ├── model_baseline.pkl
-│ └── config.yaml
-├── mlruns/ # Артефакты MLflow (игнорируется)
-├── logs/ # Runtime-логи мониторинга (игнорируется контент)
-│ └── .gitkeep # Заглушка для отслеживания директории
-├── tests/ # Юнит-тесты
-├── .gitignore # Правила исключения файлов
-├── requirements.txt # Зафиксированные зависимости
+├── airflow/ # DAG для переобучения
+├── scripts/ # Shell-скрипты запуска
+├── models/ # Сохранённые артефакты модели
+├── logs/ # Runtime-логи (игнорируется контент)
+├── .gitignore
+├── requirements.txt
 ├── params.yaml # Гиперпараметры экспериментов
 ├── MONITORING.md # Описание метрик мониторинга
 └── README.md # Данный файл
