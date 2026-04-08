@@ -18,29 +18,44 @@
 
 ## Структура репозитория
 
-```bash
+```text
 mle-banking-recsys-project-2026/
-├── project_pipeline.ipynb # Основной артефакт: единый ноутбук
+├── project_pipeline.ipynb      # Основной артефакт: единый ноутбук
 ├── src/
-│ ├── features/ # Генерация признаков
-│ ├── models/ # Обучение, инференс, метрики
-│ ├── api/ # FastAPI приложение
-│ ├── monitoring/ # Метрики мониторинга
-│ └── utils/ # Предобработка
-├── data/ # Данные (игнорируется .gitignore)
-├── docker/ # Docker-конфигурация
-│ ├── Dockerfile # Инструкции для сборки образа
-│ └── docker-compose.yml # Оркестрация контейнеров
-├── airflow/ # DAG для переобучения
-├── scripts/ # Shell-скрипты запуска
-├── models/ # Сохранённые артефакты модели
-├── logs/ # Runtime-логи (игнорируется контент)
+│   ├── features/               # Генерация признаков (engineering.py)
+│   ├── models/                 # Обучение, инференс, метрики (train.py, metrics.py)
+│   ├── api/                    # FastAPI приложение (app.py)
+│   ├── monitoring/             # Метрики мониторинга (metrics.py)
+│   └── utils/                  # Предобработка, конфиги (preprocessing.py)
+├── data/                       # Данные (игнорируется .gitignore)
+│   ├── raw/                    # Исходные данные
+│   └── processed/              # Обработанные фичи (опционально)
+├── docker/                     # Docker-конфигурация
+│   ├── Dockerfile              # Инструкции для сборки образа
+│   └── docker-compose.yml      # Оркестрация контейнеров
+├── airflow/                    # DAG для переобучения
+│   └── dags/
+│       └── retrain_dag.py      # Граф переобучения модели
+├── scripts/                    # Shell-скрипты запуска
+│   ├── setup_mlflow.sh
+│   ├── setup_production.sh
+│   └── download_data.sh
+├── models/                     # Сохранённые артефакты модели
+│   ├── model.pkl
+│   ├── feature_cols.pkl
+│   └── config.yaml
+├── logs/                       # Runtime-логи (игнорируется контент)
+│   └── .gitkeep
+├── tests/                      # Юнит-тесты
+│   └── test_api.py
 ├── .gitignore
 ├── requirements.txt
-├── params.yaml # Гиперпараметры экспериментов
-├── MONITORING.md # Описание метрик мониторинга
-└── README.md # Данный файл
+├── params.yaml                 # Гиперпараметры экспериментов
+├── MONITORING.md               # Описание метрик мониторинга
+└── README.md                   # Данный файл
 ```
+
+> **Для ревьюера**: структура оптимизирована под модульные импорты из src/. Все конфигурационные файлы вынесены в корень для удобства.
 
 ## Воспроизведение окружения
 
