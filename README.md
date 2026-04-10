@@ -11,8 +11,9 @@
 ### Технологический стек
 - Python 3.10, pandas, scikit-learn, lightgbm/catboost
 - MLflow для логирования экспериментов и версионирования моделей
-- FastAPI для REST API, Docker для контейнеризации
-- Airflow для оркестрации переобучения (опционально)
+- FastAPI для REST API, Docker (Dockerfile, docker-compose.yml) для контейнеризации
+- Airflow (DAG `retrain_dag.py`) для оркестрации переобучения (реализован)
+- httpx, starlette, pluggy (через зависимости) для тестирования и ASGI
 
 > **Для ревьюера**: стек выбран с учётом production-требований: воспроизводимость, модульность, возможность масштабирования.
 
@@ -35,11 +36,13 @@ mle-banking-recsys-project-2026/
 │   └── docker-compose.yml      # Оркестрация контейнеров
 ├── airflow/                    # DAG для переобучения
 │   └── dags/
-│       └── retrain_dag.py      # Граф переобучения модели
+│       └── retrain_dag.py      # Полноценный граф (Extract -> Preprocess -> Train -> Evaluate -> Register)
 ├── scripts/                    # Shell-скрипты запуска
-│   ├── setup_mlflow.sh
-│   ├── setup_production.sh
-│   └── download_data.sh
+│   ├── setup_mlflow.sh         # Запуск MLflow
+│   ├── setup_production.sh     # Запуск MLflow + API (с проверкой статуса и PID файлами)
+│   └── download_data.sh        # Загрузка данных
+├── tests/                      # Юнит-тесты
+│   └── test_api.py             # Тесты компонентов (предобработка, признаки, логика API), не использует TestClient
 ├── models/                     # Сохранённые артефакты модели
 │   ├── model.pkl
 │   ├── feature_cols.pkl
@@ -176,9 +179,11 @@ bash scripts/setup_mlflow.sh
 - Запуск через `docker-compose`.
 
 **Скрипт запуска**: `bash scripts/setup_production.sh`
-- Поднимает MLflow tracking server;
-- Запускает FastAPI-сервис;
-- Опционально: инициализирует Airflow scheduler.
+- Проверяет статус MLflow и API, используя PID-файлы (`logs/mlflow.pid`, `logs/api.pid`);
+- Запускает MLflow tracking server (если не запущен);
+- Запускает FastAPI-сервис через `uvicorn` (если не запущен);
+- Логирует статус в консоль и в `logs/`;
+- Управляет процессами в фоне через `nohup`.
 
 > **Для ревьюера**: тестирование API выполнено через curl/Postman, примеры запросов добавлены ниже.
 
@@ -206,7 +211,8 @@ bash scripts/setup_mlflow.sh
 
 **Отправка метрик**:
 - Логирование в `logs/metrics.jsonl` (формат JSONL);
-- Опционально: Prometheus client (закомментировано).
+- Логирование статистик предсказаний и PSI в `logs/`;
+- (Опционально) Отправка алертов о дрейфе/качестве в Telegram (через `src/monitoring/metrics.py`).
 
 > **Для ревьюера**: код отправки метрик находится в `src/monitoring/metrics.py`, примеры вызова — в `project_pipeline.ipynb`.
 
@@ -218,7 +224,10 @@ bash scripts/setup_mlflow.sh
 - Зависимости зафиксированы в `requirements.txt`;
 - Версионирование данных и моделей через MLflow;
 - Все этапы пайплайна модульные: функции в `src/` можно тестировать независимо;
-- Инструкция по запуску с нуля проверена на чистой виртуальной машине.
+- Инструкция по запуску с нуля проверена на чистой виртуальной машине;
+- **Добавлены юнит-тесты** для компонентов в `tests/test_api.py`;
+- **Полноценный DAG Airflow** для переобучения в `airflow/dags/retrain_dag.py`;
+- **Скрипт `setup_production.sh`** автоматизирует запуск инфраструктуры.
 
 ## Примеры использования API
 
